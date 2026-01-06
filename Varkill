@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Проверка устройства</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #4CAF50;
+        }
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 36px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .auto-box {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .countdown {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffc107;
+            margin: 10px 0;
+        }
+        .steps {
+            text-align: left;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+        }
+        .step-num {
+            background: #4CAF50;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📱→🌐</div>
+        <h1>Автопроверка устройства</h1>
+        <p>Откройте в браузере для автоматической проверки камеры и системы</p>
+        
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <div>Нажмите кнопку ниже</div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div>Откроется в Chrome</div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div>Нажмите "Разрешить" камеру</div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div>Проверка выполнится сама</div>
+            </div>
+        </div>
+        
+        <button class="btn" id="openBtn">
+            <span>🚀</span>
+            Открыть проверку
+        </button>
+        
+        <div class="auto-box">
+            <p>Автозапуск через:</p>
+            <div class="countdown" id="countdown">5</div>
+            <p>секунд</p>
+        </div>
+        
+        <p style="font-size: 14px; opacity: 0.7; margin-top: 20px;">
+            Проверка займет 3 секунды, фото сохранится автоматически
+        </p>
+    </div>
+
+    <script>
+        // Определяем устройство
+        const isTelegram = navigator.userAgent.includes('Telegram');
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        const currentUrl = window.location.href;
+        
+        // Функция открытия в Chrome
+        function openInChrome() {
+            if (isAndroid) {
+                // Intent ссылка для Android
+                const cleanUrl = currentUrl.replace(/https?:\/\//, '');
+                const intentUrl = `intent://${cleanUrl}#Intent;package=com.android.chrome;scheme=https;end`;
+                window.location.href = intentUrl;
+                
+                // Запасной вариант
+                setTimeout(() => {
+                    window.open(currentUrl, '_blank');
+                }, 500);
+            } else {
+                // Для iOS и других
+                window.open(currentUrl, '_blank');
+            }
+        }
+        
+        // Обработчик кнопки
+        document.getElementById('openBtn').addEventListener('click', openInChrome);
+        
+        // Автозапуск через 5 секунд
+        let count = 5;
+        const timer = setInterval(() => {
+            count--;
+            document.getElementById('countdown').textContent = count;
+            
+            if (count <= 0) {
+                clearInterval(timer);
+                openInChrome();
+            }
+        }, 1000);
+        
+        // Если уже в браузере (не в Telegram)
+        if (!isTelegram) {
+            // Показываем сообщение что можно начать проверку
+            setTimeout(() => {
+                document.querySelector('.container').innerHTML = `
+                    <div class="icon">✅</div>
+                    <h1>Готово к проверке!</h1>
+                    <p>Нажмите кнопку чтобы начать автоматическую проверку устройства</p>
+                    <button class="btn" onclick="startCheck()" style="margin: 30px 0;">
+                        <span>📸</span>
+                        Начать проверку
+                    </button>
+                    <p style="font-size: 14px; opacity: 0.7;">
+                        Будет использована фронтальная камера
+                    </p>
+                `;
+            }, 3000);
+        }
+        
+        // Функция для проверки в браузере
+        function startCheck() {
+            // Код автоматического фото (будет работать только в браузере)
+            alert("Проверка запустится в Chrome!");
+        }
+    </script>
+</body>
+</html>
